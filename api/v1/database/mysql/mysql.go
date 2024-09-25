@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -13,10 +14,10 @@ var (
 	DB *gorm.DB
 )
 
-func InitDB() (err error) {
-	err = godotenv.Load()
+func InitDB() {
+	err := godotenv.Load()
 	if err != nil {
-		return
+		log.Panicf("Error while loading env: %s", err)
 	}
 
 	dsn := fmt.Sprintf(
@@ -28,6 +29,7 @@ func InitDB() (err error) {
 	)
 
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	
-	return
+	if err != nil {
+		log.Panicf("Error while init DB: %s", err)
+	}
 }
