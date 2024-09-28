@@ -1,9 +1,17 @@
-# GET http://localhost:3000/api/v1/healthcheck HTTP/1.1
+GET http://localhost:3000/api/v1/authorized/healthcheck HTTP/1.1
 
-POST http://localhost:3000/api/v1/create-user HTTP/1.1
+# # POST http://localhost:3000/api/v1/create-user HTTP/1.1
+# # Content-Type: application/json
+
+# # {
+# #     "username": "0192837466",
+# #     "password": "1213"
+# # }
+
+POST http://localhost:3000/api/v1/login HTTP/1.1
 Content-Type: application/json
 
 {
-    "username": "0123456789",
-    "password": "1212"
+    "username": "0192837466",
+    "password": "1213"
 }
