@@ -1,39 +1,24 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
-
-	v1 "github.com/braam76/auth-backend/api/v1"
-	"github.com/braam76/auth-backend/api/v1/database/models"
-	"github.com/braam76/auth-backend/api/v1/database/mysql"
-	"github.com/braam76/auth-backend/api/v1/middleware"
-	"github.com/braam76/auth-backend/api/v1/session"
-	"github.com/go-chi/chi/v5"
-	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/braam76/auth-backend/api"
+	"github.com/braam76/auth-backend/api/v1/database"
+	"github.com/braam76/auth-backend/api/v1/utils"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
-	session.InitSessionStore()
+	app := fiber.New()
 
-	mysql.InitDB()
-	err := mysql.DB.AutoMigrate(
-		models.User{},
-	)
-	if err != nil {
-		log.Panicf("Error while migrating table(s): %s", err)
-	}
+	database.InitDB()
+	defer database.DB.Close()
 
-	r := chi.NewRouter()
-	r.Use(
-		chiMiddleware.Logger,
-		chiMiddleware.Recoverer,
-		middleware.SessionMiddleware,
-	)
+	app.Route("/api", func(router fiber.Router) {
+		utils.InitSessionStore()
 
-	r.Route("/api/v1", v1.Router)
+		// In future, add v2 same as v1 if needed
+		router.Route("/v1", api.V1)
+	})
 
-	fmt.Print("Running on http://localhost:3000")
-	log.Panicf("Error while running app: %s\n", http.ListenAndServe(":3000", r))
+	app.Listen(":3000")
 }

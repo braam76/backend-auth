@@ -1,23 +1,30 @@
 package models
 
 import (
-	"regexp"
+	"fmt"
 
-	"github.com/braam76/auth-backend/api/v1/utils"
-	"gorm.io/gorm"
+	"github.com/braam76/auth-backend/api/v1/database"
 )
 
-type User struct {
-	*gorm.Model
-	Username string `gorm:"not null;unique;type:char(10)"`
-	Password string `gorm:"not null"`
-}
+var CreateUserTable = `
+CREATE TABLE IF NOT EXISTS users (
+	id 			INT AUTO_INCREMENT PRIMARY KEY,
+	username	VARCHAR(50),
+	password 	VARCHAR(100) UNIQUE
+);`
 
-func (u User) ValidateUser() []string {
-	validationSteps := []utils.ValidationStep{
-		{Stmt: len(u.Username) == 10, Err: "Username length is not 10 chars"},
-		{Stmt: regexp.MustCompile(`[0-9]+$`).MatchString(u.Username), Err: "Username should contain only numbers"},
+func init() {
+	if _, err := database.DB.Exec(CreateUserTable); err != nil {
+		panic(err)
 	}
 
-	return utils.Validate(validationSteps)
+	fmt.Println("Table 'users' created or already exists.")
+}
+
+func Insert(username, password string) {
+	if _, err := database.DB.Query("INSERT INTO users VALUE('%s', '%s')")
+}
+
+func GetAll() {
+	
 }
