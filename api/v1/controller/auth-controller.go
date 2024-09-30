@@ -7,4 +7,5 @@ import (
 
 func AuthController(auth fiber.Router) {
 	auth.Post("/login", authservice.Login)
+	auth.Post("/create", authservice.Create)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/braam76/auth-backend/api"
 	"github.com/braam76/auth-backend/api/v1/database"
+	"github.com/braam76/auth-backend/api/v1/database/models"
 	"github.com/braam76/auth-backend/api/v1/utils"
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,7 +12,9 @@ func main() {
 	app := fiber.New()
 
 	database.InitDB()
-	defer database.DB.Close()
+	database.DB.AutoMigrate(
+		&models.UserModel{},
+	)
 
 	app.Route("/api", func(router fiber.Router) {
 		utils.InitSessionStore()
