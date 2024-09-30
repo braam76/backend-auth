@@ -25,3 +25,4 @@ go.work.sum
 .env
 
 mysql_data/
+redis_data/
