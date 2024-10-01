@@ -6,7 +6,6 @@ import (
 	"github.com/braam76/auth-backend/api/v1/database"
 	"github.com/braam76/auth-backend/api/v1/database/models"
 	"github.com/braam76/auth-backend/api/v1/dto"
-	"github.com/braam76/auth-backend/api/v1/utils"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -14,8 +13,20 @@ func Login(c *fiber.Ctx) error {
 	var userDto dto.LoginUserDTO
 	var userModel models.UserModel
 
+	session, err := database.Redis.Get(c)
+	if err != nil {
+		log.Printf("[ERROR] = %s\n", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	if session.Get("user_id") != nil {
+		c.Set("Location", "/healthcheck")
+		return c.SendStatus(fiber.StatusFound)
+	}
+
 	if err := c.BodyParser(&userDto); err != nil {
 		log.Printf("[ERROR] = %s\n", err)
+		log.Printf("%+v", userDto)
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
@@ -34,12 +45,6 @@ func Login(c *fiber.Ctx) error {
 	if result.Error != nil {
 		log.Printf("[ERROR] = %s\n", result.Error)
 		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	session, err := utils.SessionStore.Get(c)
-	if err != nil {
-		log.Printf("[ERROR] = %s\n", err)
-		return nil
 	}
 
 	session.Set("user_id", userModel.ID)
