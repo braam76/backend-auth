@@ -42,7 +42,14 @@ func Login(c *fiber.Ctx) error {
 		return nil
 	}
 
-	log.Printf("%+v\n", session)
+	session.Set("user_id", userModel.ID)
+
+	if err := session.Save(); err != nil {
+		log.Printf("[ERROR] = %s\n", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	log.Printf("%+v\n", session.Get("user_id"))
 
 	log.Println(userModel)
 	return c.SendString("GOOD! Login")
